@@ -1,5 +1,8 @@
 package com.fxiaoke.azkaban.ldap;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -13,6 +16,7 @@ import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
+import azkaban.user.Permission;
 import azkaban.user.Role;
 import azkaban.user.User;
 import azkaban.user.UserManager;
@@ -27,6 +31,7 @@ public class LdapUserAuthenticator implements UserManager {
 
   private LdapAuthenticationConfig ldapConfig = new LdapAuthenticationConfig();
   private Control[] controls;
+  private List<String> adminUsers = new ArrayList<>();
 
   public LdapUserAuthenticator(Props props) {
     ldapConfig.setAdminName(props.get("user.manager.ldap.adminName"));
@@ -34,6 +39,11 @@ public class LdapUserAuthenticator implements UserManager {
     ldapConfig.setBaseDN(props.get("user.manager.ldap.baseDN"));
     ldapConfig.setLdapURL(props.get("user.manager.ldap.ldapURL"));
     ldapConfig.setAdminPassword(props.get("user.manager.ldap.adminPassword"));
+
+    String admins = props.get("user.manager.ldap.adminUsers");
+    if (admins != null && admins.trim().length() > 0) {
+      adminUsers = Arrays.asList(admins.split(","));
+    }
   }
 
   private LdapContext getLdapContext() throws NamingException {
@@ -116,6 +126,9 @@ public class LdapUserAuthenticator implements UserManager {
         String mail = mailAttribute.get().toString();
         user.setEmail(mail);
       }
+      if (adminUsers.contains(username)) {
+        user.addRole("admin");
+      }
     } catch (NamingException e) {
       throw new UserManagerException("LDAP error: " + e.getMessage(), e);
     } finally {
@@ -158,12 +171,14 @@ public class LdapUserAuthenticator implements UserManager {
 
   @Override
   public boolean validateGroup(String group) {
-    return false;
+    return true;
   }
 
   @Override
   public Role getRole(String roleName) {
-    return null;
+    Permission permission = new Permission();
+    permission.addPermissionsByName(roleName.toUpperCase());
+    return new Role(roleName, permission);
   }
 
   @Override
