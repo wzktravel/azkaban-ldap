@@ -25,7 +25,6 @@ import azkaban.utils.Props;
 
 /**
  * ldap using jndi
- * Created by wzk on 16/6/23.
  */
 public class LdapUserAuthenticator implements UserManager {
 

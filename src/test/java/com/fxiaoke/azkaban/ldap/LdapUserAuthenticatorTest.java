@@ -20,8 +20,8 @@ public class LdapUserAuthenticatorTest {
   public void before() throws Exception {
     Props props = new Props();
     props.put("user.manager.ldap.ldapURL", "LDAP://firstshare.cn");
-    props.put("user.manager.ldap.adminName", "FSSvca015@firstshare.cn");
-    props.put("user.manager.ldap.adminPassword", "kd[y8c&<lGM%dSX");
+    props.put("user.manager.ldap.adminName", "user");
+    props.put("user.manager.ldap.adminPassword", "password");
     props.put("user.manager.ldap.domain", "firstshare.cn");
     props.put("user.manager.ldap.baseDN", "DC=firstshare,DC=cn");
     authenticator = new LdapUserAuthenticator(props);
@@ -29,7 +29,7 @@ public class LdapUserAuthenticatorTest {
 
   @Test
   public void getUser() throws Exception {
-    User wangzk = authenticator.getUser("wangzk", "");
+    User wangzk = authenticator.getUser("user", "");
     String email = wangzk.getEmail();
     String userId = wangzk.getUserId();
     System.out.println(userId);

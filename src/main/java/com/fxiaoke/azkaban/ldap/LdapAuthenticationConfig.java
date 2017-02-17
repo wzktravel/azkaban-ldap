@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 /**
  * Ldap配置信息，配置管理员账号密码以及根DN等
- * Created by jiangwj on 2015/12/29.
  */
 public class LdapAuthenticationConfig implements Serializable{
   private String adminName;
